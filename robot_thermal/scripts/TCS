@@ -1,0 +1,33 @@
+import rospy
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Callback function for receiving array data
+def thermal_frame_callback(data):
+    # Assuming 'data' is the received array data from ROS
+    array_data = np.array(data)  # Convert the received data to a NumPy array
+    show_heatmap(array_data)  # Call the function to display the heatmap
+
+# Function to display the heatmap using Matplotlib
+def show_heatmap(data_array):
+    plt.figure(figsize=(8, 6))  # Adjust the figure size if needed
+
+    # Display the heatmap (replace 'hot' with the desired colormap)
+    plt.imshow(data_array, cmap='hot', interpolation='nearest')
+    plt.colorbar()  # Add a color bar for reference
+    plt.title('Heatmap')  # Add a title if needed
+
+    plt.show()  # Display the heatmap
+
+def thermal_frame_subscriber():
+    rospy.init_node('thermal_frame_subscriber', anonymous=True)
+    # Subscribe to the ROS topic to receive array data
+    rospy.Subscriber('/your_array_topic', YourArrayType, thermal_frame_callback)
+    rospy.spin()
+
+if __name__ == '__main__':
+    try:
+        thermal_frame_subscriber()
+    except rospy.ROSInterruptException:
+        pass
+

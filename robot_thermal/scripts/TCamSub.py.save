@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+import rospy
+import json
+from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import Byte, String
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import ndimage
+
+mlx_shape = (24,32) # mlx90640 shape
+
+mlx_interp_val = 10 # interpolate # on each dimension
+mlx_interp_shape = (mlx_shape[0]*mlx_interp_val,
+                    mlx_shape[1]*mlx_interp_val) # new shape
+                    
+fig = plt.figure(figsize=(12,9)) # start figure
+ax = fig.add_subplot(111) # add subplot
+fig.subplots_adjust(0.05,0.05,0.95,0.95) # get rid of unnecessary padding
+therm1 = ax.imshow(np.zeros(mlx_interp_shape),interpolation='none',
+                   cmap=plt.cm.plasma,vmin=25,vmax=45) # preemptive image
+cbar = fig.colorbar(therm1) # setup colorbar
+cbar.set_label('Temperature [$^{\circ}$C]',fontsize=14) # colorbar label
+
+fig.canvas.draw() # draw figure to copy background
+ax_background = fig.canvas.copy_from_bbox(ax.bbox) # copy background
+fig.show() # show the figure before blitting
+
+def thermal_frame_callback(data):
+    fig.canvas.restore_region(ax_background) # restore background
+    print("listening")
+    frame = np.frombuffer(data.data, dtype=np.float32)
+    print("received")
+    print(frame.shape)
+    data_array = np.fliplr(np.reshape(frame, mlx_shape))
+    print("reshaping")
+    print(data_array.shape)
+    data_array = ndimage.zoom(data_array, mlx_interp_val)
+    print(data_array)
+    print(data_array.shape)
+    therm1.set_array(data_array)  # Set data
+    therm1.set_clim(vmin=np.min(data_array), vmax=np.max(data_array))  # Set bounds for the image
+    cbar.on_mappable_changed(therm1)
+    print("Color bar updated")
+    ax.draw_artist(therm1)  # Draw new thermal image
+    print("update draw")
+    fig.canvas.blit(ax.bbox)  # Draw background
+    print("Update background")
+    fig.canvas.flush_events()  # Show the new image
+    print("show image")
+
+    return
+
+def thermal_frame_subscriber():
+    rospy.init_node('thermal_frame_subscriber', anonymous=True)
+    rospy.Subscriber('/thermal_frame', CompressedImage, thermal_frame_callback)    
+    # Spin to keep the node alive
+    rospy.spin()
+
+t_array = []
+while True:
+    t1 = time.monotonic() # for determining frame rate
+    try:
+        plot_update() # update plot
+    except:
+        continue
+    # approximating frame rate
+    t_array.append(time.monotonic()-t1)
+    if len(t_array)>10:
+        t_array = t_array[1:] # recent times for frame rate approx
+    print('Frame Rate: {0:2.1f}fps'.format(len(t_array)/np.sum(t_array)))
+
+
+if __name__ == '__main__':
+    try:
+        thermal_frame_subscriber()
+        thermal_frame_callback()
+    except rospy.ROSInterruptException:
+        pas
