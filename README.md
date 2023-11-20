@@ -31,6 +31,7 @@ sudo apt install ros-[DISTRO]-hector-trajectory-server
 ## Install the whole build
 ```
 cd ~/catkin_ws/src
+git clone https://github.com/roiksa/SLAM.git
 python3 -m pip install -r ultralytics_ros/requirements.txt
 cd ~/catkin_ws
 rosdep install -r -y -i --from-paths .
