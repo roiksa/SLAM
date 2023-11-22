@@ -5,25 +5,6 @@ Based on
 - ORBSLAM3 Ros wrapper by thien94 (https://github.com/thien94/orb_slam3_ros)
 - Yolov8 ROS by Alpaca-zip (https://github.com/Alpaca-zip/ultralytics_ros)
 
-
-## Install libeigen3-dev
-
-```
-sudo apt install libeigen3-dev
-```
-
-
-## Install Pangolin
-
-```
-cd ~
-git clone https://github.com/stevenlovegrove/Pangolin.git
-cd Pangolin
-mkdir build && cd build
-make ..
-make
-sudo make install
-```
 ## Install ROS NOETIC on Ubuntu 20.04
 
 1. Add Official Noetic Repo to Ubuntu
@@ -33,8 +14,8 @@ echo "deb http://packages.ros.org/ros/ubuntu focal main" | sudo tee /etc/apt/sou
 
 2. Add official ROS Keyring
 
-Next, add the official ROS keyring to your Ubuntu 20.04 system. There are two ways to go about this.
-The first method is to use the hkp://keyserver.ubuntu.com:80 Ubuntu key server. If this does not work, you can try to replace it with hkp://pgp.mit.edu:80. So, run the command below.
+There are two method to add official ROS Keyring.
+If first method does not work, you can try second methode
 
 Method 1
 ```
@@ -63,6 +44,26 @@ sudo apt install ros-noetic-desktop-full
 ```
 source /opt/ros/noetic/setup.bash
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+```
+
+
+## Install libeigen3-dev
+
+```
+sudo apt install libeigen3-dev
+```
+
+
+## Install Pangolin
+
+```
+cd ~
+git clone https://github.com/stevenlovegrove/Pangolin.git
+cd Pangolin
+mkdir build && cd build
+make ..
+make
+sudo make install
 ```
 
 ## Install Hector Trajectory Server
