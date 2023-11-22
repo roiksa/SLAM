@@ -24,6 +24,47 @@ make ..
 make
 sudo make install
 ```
+## Install ROS NOETIC on Ubuntu 20.04
+
+1. Add Official Noetic Repo to Ubuntu
+```
+echo "deb http://packages.ros.org/ros/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/ros-focal.list
+```
+
+2. Add official ROS Keyring
+
+Next, add the official ROS keyring to your Ubuntu 20.04 system. There are two ways to go about this.
+The first method is to use the hkp://keyserver.ubuntu.com:80 Ubuntu key server. If this does not work, you can try to replace it with hkp://pgp.mit.edu:80. So, run the command below.
+
+Method 1
+```
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+```
+
+Method 2
+```
+curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add -
+```
+
+3.Update the ROS package index
+
+```
+sudo apt update
+```
+
+4.Install ROS Noetic on Ubuntu 20.04
+
+```
+sudo apt install ros-noetic-desktop-full
+```
+
+5.Set up ROS Noetic Environment
+
+```
+source /opt/ros/noetic/setup.bash
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+```
+
 ## Install Hector Trajectory Server
 ```
 sudo apt install ros-[DISTRO]-hector-trajectory-server
