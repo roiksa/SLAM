@@ -1,0 +1,76 @@
+<launch>
+    <param name="use_sim_time" value="false" />
+
+    <!-- Main node -->
+    <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono" output="screen">
+        <!-- change the topics according to the dataset -->
+        <remap from="/camera/image_raw" to="/image_raw"/>
+
+        <!-- Parameters for original ORB-SLAM3 -->
+        <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
+        <param name="settings_file" type="string" value="$(find orb_slam3_ros)/config/Monocular/EuRoC.yaml"/>
+
+        <!-- Parameters for ROS -->
+        <param name="world_frame_id"    type="string"   value="world" />
+        <param name="cam_frame_id"      type="string"   value="camera" />
+        <param name="enable_pangolin"   type="bool"     value="false" />
+    </node>
+    
+    <!-- Visualization -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find orb_slam3_ros)/config/orb_slam3_no_imu.rviz" output="screen" />
+    
+    <!-- Trajectory path -->
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
+        <param name="/target_frame_name" value="/world" />
+        <param name="/source_frame_name" value="/camera" />
+        <param name="/trajectory_update_rate" value="20.0" />
+        <param name="/trajectory_publish_rate" value="20.0" />
+    </node>
+    
+    <node pkg="robot_thermal" type="uncom.py" name="uncompressor" output="screen"/>
+    <node pkg="robot_thermal" type="TCS.py" name="thermal_cam_proccessor" output="screen"/>
+    
+    <node name="cam_node" pkg="ultralytics_ros" type="tracker_node2.py" output="screen">
+        <param name="yolo_model" value="yolov8n.pt"/>
+        <param name="detection_topic" value="cam_result"/>
+        <param name="image_topic" value="image_raw"/>
+        <param name="conf_thres" value="0.25"/>
+        <param name="iou_thres" value="0.45"/>
+        <param name="max_det" value="10"/>
+        <param name="tracker" value="bytetrack.yaml"/>
+        <param name="debug" value="true"/>
+        <param name="debug_conf" value="true"/>
+        <param name="debug_line_width" value="1"/>
+        <param name="debug_font_size" value="1"/>
+        <param name="debug_font" value="Arial.ttf"/>
+        <param name="debug_labels" value="true"/>
+        <param name="debug_boxes" value="true"/>
+        <rosparam>
+           # classes: [0] (Human)
+           # See also : https://github.com/ultralytics/ultralytics/blob/main/ultralytics/datasets/coco128.yaml
+        </rosparam>
+    </node>
+    
+    <node name="thermal_node" pkg="ultralytics_ros" type="tracker_node.py" output="screen">
+        <param name="yolo_model" value="best.pt"/>
+        <param name="detection_topic" value="tcam_result"/>
+        <param name="image_topic" value="thermal_img_topic"/>
+        <param name="conf_thres" value="0.25"/>
+        <param name="iou_thres" value="0.45"/>
+        <param name="max_det" value="10"/>
+        <param name="tracker" value="bytetrack.yaml"/>
+        <param name="debug" value="true"/>
+        <param name="debug_conf" value="true"/>
+        <param name="debug_line_width" value="1"/>
+        <param name="debug_font_size" value="1"/>
+        <param name="debug_font" value="Arial.ttf"/>
+        <param name="debug_labels" value="true"/>
+        <param name="debug_boxes" value="true"/>
+        <rosparam>
+           # classes: [0] (Human)
+           # See also : https://github.com/ultralytics/ultralytics/blob/main/ultralytics/datasets/coco128.yaml
+        </rosparam>
+    </node>    
+        
+    
+</launch>
